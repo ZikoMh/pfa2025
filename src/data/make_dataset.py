@@ -121,8 +121,27 @@ data_merged = pd.concat([acc_df1.iloc[:,:3],gyr_df2],axis=1)
 
 # Accelerometer:    12.500HZ
 # Gyroscope:        25.000Hz
+sampling = {
+    'x-axis (g)':"mean", 
+    'y-axis (g)':"mean", 
+    'z-axis (g)':"mean", 
+    'x-axis (deg/s)':"mean",
+    'y-axis (deg/s)':"mean", 
+    'z-axis (deg/s)':"mean", 
+    'participants':"last", 
+    'label':"last", 
+    'category':"last",
+    'set':"last"
+}
+data_merged[:100].resample(rule="200ms").apply(sampling)
+days =[g for n , g in data_merged.groupby(pd.Grouper(freq="D"))]
+data_resampled = pd.concat([df.resample(rule="200ms").apply(sampling).dropna() for df in days])
+data_resampled.info()
+data_resampled["set"]=data_resampled["set"].astype(int)
 
 
 # --------------------------------------------------------------
 # Export dataset
 # --------------------------------------------------------------
+
+data_resampled.to_pickle("C:/Users/USER/Desktop/pfa2025/dataScience/data/intermim/data_resampled.pkl")
